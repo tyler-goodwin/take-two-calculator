@@ -1,0 +1,34 @@
+::backdrop {
+  background-color: #000;
+  opacity: 0.3;
+}
+
+.Modal {
+  color: var(--bone-200);
+  background-color: var(--green-800);
+  margin: 3rem auto;
+  width: min(100%, 450px);
+  min-height: 50vh;
+}
+
+.ModalHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.ModalHeader h2 {
+  color: var(--red-200);
+  margin: 0;
+}
+
+.PastGamesList {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+}
+
+.GameEntry {
+  display: contents;
+  color: var(--blue-300);
+}

@@ -1,14 +1,28 @@
 import { FC, Fragment, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { useScoringLogic, Player } from "./useScoringLogic";
+import { useGameHistory } from "./useGameHistory";
+import { HistoryModal } from "./HistoryModal";
 
 function App() {
   const state = useScoringLogic();
+  const history = useGameHistory();
+  const [showHistory, setShowHistory] = useState(false);
 
   const sortedPlayers = useMemo(
     () => [...state.players].sort((a, b) => b.score - a.score),
     [state.players]
   );
+
+  const onNewGame = () => {
+    if (!confirm("Are you sure?")) return;
+
+    history.add({
+      date: new Date().toLocaleDateString(),
+      scores: sortedPlayers.map((p) => ({ name: p.name, score: p.score })),
+    });
+    state.clearWords();
+  };
 
   return (
     <>
@@ -20,13 +34,11 @@ function App() {
           <button type="button" onClick={() => state.addPlayer("New Player")}>
             Add Player
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (confirm("Are you sure?")) state.clearWords();
-            }}
-          >
+          <button type="button" onClick={onNewGame}>
             New Game
+          </button>
+          <button type="button" onClick={() => setShowHistory(true)}>
+            History
           </button>
         </section>
         <section className="Summary">
@@ -50,6 +62,11 @@ function App() {
           ))}
         </section>
       </main>
+      <HistoryModal
+        open={showHistory}
+        onClose={() => setShowHistory(false)}
+        history={history}
+      />
     </>
   );
 }
@@ -63,7 +80,6 @@ const bindState = (
     removeWord: (i) => state.removeWord(playerIndex, i),
     removePlayer: () => {
       if (confirm("Are you sure?")) state.removePlayer(playerIndex);
-      else console.log("what");
     },
     setName: (n) => state.setPlayerName(playerIndex, n),
   };
