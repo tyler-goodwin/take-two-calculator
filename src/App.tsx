@@ -18,7 +18,12 @@ function App() {
           <button type="button" onClick={() => state.addPlayer("New Player")}>
             Add Player
           </button>
-          <button type="button" onClick={() => state.clearWords()}>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Are you sure?")) state.clearWords();
+            }}
+          >
             New Game
           </button>
         </div>
@@ -54,7 +59,10 @@ const bindState = (
   return {
     addWord: (w) => state.addWord(playerIndex, w),
     removeWord: (i) => state.removeWord(playerIndex, i),
-    removePlayer: () => state.removePlayer(playerIndex),
+    removePlayer: () => {
+      if (confirm("Are you sure?")) state.removePlayer(playerIndex);
+      else console.log("what");
+    },
     setName: (n) => state.setPlayerName(playerIndex, n),
   };
 };
@@ -71,6 +79,7 @@ interface PlayerProps {
 
 const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
   const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const wordInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -80,19 +89,37 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
         onUpdate={(n) => actions.setName(n)}
         onRemove={() => actions.removePlayer()}
       />
-      {!adding && (
-        <div className="Player__actions">
-          <button
-            type="button"
-            onClick={() => {
-              setAdding(true);
-              setTimeout(() => wordInputRef.current?.focus());
-            }}
-          >
-            + Add Words
-          </button>
-        </div>
-      )}
+      <div className="Player__actions">
+        {!adding && !removing && (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setAdding(true);
+                setTimeout(() => wordInputRef.current?.focus());
+              }}
+            >
+              + Add Words
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setRemoving(true);
+              }}
+            >
+              Edit
+            </button>
+          </>
+        )}
+        {removing && (
+          <>
+            <span className="red-200">Removing words</span>
+            <button type="button" onClick={() => setRemoving(false)}>
+              Cancel
+            </button>
+          </>
+        )}
+      </div>
       {adding && (
         <form
           className="Player__wordForm"
@@ -113,12 +140,21 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
           </button>
         </form>
       )}
-      {player.words.length === 0 && "No words added"}
+      {player.words.length === 0 && <em>No words added</em>}
       <div className="Player__wordList">
         {player.words.map((w, i) => (
           <Fragment key={i}>
             <span>{w.word}</span>
-            <span className="right-align">{w.score}</span>
+            {!removing && <span className="right-align">{w.score}</span>}
+            {removing && (
+              <button
+                type="button"
+                onClick={() => actions.removeWord(i)}
+                className="danger"
+              >
+                X
+              </button>
+            )}
           </Fragment>
         ))}
         <span className="Player__scoreTotal">Total:</span>
@@ -173,8 +209,9 @@ const PlayerName: FC<PlayerNameProps> = (props) => {
       </div>
       <button
         type="button"
-        onClick={() => props.onRemove()}
+        onClick={props.onRemove}
         title="Remove Player"
+        className="danger"
       >
         X
       </button>
