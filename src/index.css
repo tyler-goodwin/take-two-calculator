@@ -69,6 +69,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
+  color: var(--neutral-900);
   background-color: var(--green-300);
   border: 1px solid transparent;
   border-radius: 3px;
