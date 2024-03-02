@@ -12,9 +12,11 @@ function App() {
 
   return (
     <>
-      <div>
+      <header>
         <h1 className="Title">Take Two</h1>
-        <div className="GameActions">
+      </header>
+      <main>
+        <section className="GameActions">
           <button type="button" onClick={() => state.addPlayer("New Player")}>
             Add Player
           </button>
@@ -26,8 +28,8 @@ function App() {
           >
             New Game
           </button>
-        </div>
-        <div className="Summary">
+        </section>
+        <section className="Summary">
           <h2>Scoreboard</h2>
           <div className="Summary__playerList">
             {sortedPlayers.map((player) => (
@@ -37,8 +39,8 @@ function App() {
               </Fragment>
             ))}
           </div>
-        </div>
-        <div className="PlayersList">
+        </section>
+        <section className="PlayersList">
           {state.players.map((p, playerIndex) => (
             <PlayerView
               key={playerIndex}
@@ -46,8 +48,8 @@ function App() {
               actions={bindState(playerIndex, state)}
             />
           ))}
-        </div>
-      </div>
+        </section>
+      </main>
     </>
   );
 }

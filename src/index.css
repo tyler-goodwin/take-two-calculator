@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Notable&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Notable&family=Roboto+Slab:wght@100..900&display=swap");
 :root {
   --neutral-900: #110506;
 
@@ -23,9 +23,13 @@
 
   --piece-font: "Notable", sans-serif;
 
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: "Roboto Slab", serif;
+  font-optical-sizing: auto;
   font-weight: 600;
+  letter-spacing: 0.07rem;
+  font-style: normal;
+
+  line-height: 1.5;
 
   color: var(--bone-200);
   background-color: var(--green-800);
