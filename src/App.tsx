@@ -1,15 +1,20 @@
-import { FC, Fragment, useRef, useState } from "react";
+import { FC, Fragment, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { useScoringLogic, Player } from "./useScoringLogic";
 
 function App() {
   const state = useScoringLogic();
 
+  const sortedPlayers = useMemo(
+    () => [...state.players].sort((a, b) => b.score - a.score),
+    [state.players]
+  );
+
   return (
     <>
       <div>
-        <h1>Take Two</h1>
-        <div>
+        <h1 className="Title">Take Two</h1>
+        <div className="GameActions">
           <button type="button" onClick={() => state.addPlayer("New Player")}>
             Add Player
           </button>
@@ -17,13 +22,26 @@ function App() {
             New Game
           </button>
         </div>
-        {state.players.map((p, playerIndex) => (
-          <PlayerView
-            key={playerIndex}
-            player={p}
-            actions={bindState(playerIndex, state)}
-          />
-        ))}
+        <div className="Summary">
+          <h2>Scoreboard</h2>
+          <div className="Summary__playerList">
+            {sortedPlayers.map((player) => (
+              <Fragment key={player.name}>
+                <span>{player.name}</span>
+                <span className="right-align">{player.score}</span>
+              </Fragment>
+            ))}
+          </div>
+        </div>
+        <div className="PlayersList">
+          {state.players.map((p, playerIndex) => (
+            <PlayerView
+              key={playerIndex}
+              player={p}
+              actions={bindState(playerIndex, state)}
+            />
+          ))}
+        </div>
       </div>
     </>
   );
@@ -56,21 +74,28 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
   const wordInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div>
+    <div className="Player">
       <PlayerName
         name={player.name}
         onUpdate={(n) => actions.setName(n)}
         onRemove={() => actions.removePlayer()}
       />
       {!adding && (
-        <div>
-          <button type="button" onClick={() => setAdding(true)}>
-            +
+        <div className="Player__actions">
+          <button
+            type="button"
+            onClick={() => {
+              setAdding(true);
+              setTimeout(() => wordInputRef.current?.focus());
+            }}
+          >
+            + Add Words
           </button>
         </div>
       )}
       {adding && (
         <form
+          className="Player__wordForm"
           onSubmit={(e) => {
             e.preventDefault();
             if (!wordInputRef.current) return;
@@ -89,17 +114,15 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
         </form>
       )}
       {player.words.length === 0 && "No words added"}
-      <div>
+      <div className="Player__wordList">
         {player.words.map((w, i) => (
           <Fragment key={i}>
             <span>{w.word}</span>
-            <span>{w.score}</span>
+            <span className="right-align">{w.score}</span>
           </Fragment>
         ))}
-        <div>
-          <span>Total:</span>
-          <span>{player.score}</span>
-        </div>
+        <span className="Player__scoreTotal">Total:</span>
+        <span className="Player__scoreTotal right-align">{player.score}</span>
       </div>
     </div>
   );
@@ -120,6 +143,7 @@ const PlayerName: FC<PlayerNameProps> = (props) => {
   if (editing) {
     return (
       <form
+        className="Player__nameForm"
         onSubmit={(e) => {
           e.preventDefault();
           props.onUpdate(value);
@@ -138,7 +162,7 @@ const PlayerName: FC<PlayerNameProps> = (props) => {
   }
 
   return (
-    <div>
+    <div className="Player__name">
       <div
         onClick={() => {
           setEditing(true);

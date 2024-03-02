@@ -1,5 +1,81 @@
+:root {
+  --width: min(100%, 450px);
+}
+
 #root {
-  max-width: 1280px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem 2rem;
+}
+
+.Title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.GameActions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.Summary {
+  margin-bottom: 3rem;
+  width: var(--width);
+}
+
+.Summary__playerList {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.PlayersList {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.Player {
+  width: var(--width);
+  margin-bottom: 2rem;
+}
+
+.Player__name,
+.Player__nameForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.Player__name h2 {
+  margin: 0;
+}
+
+.Player__actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.Player__wordForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.Player__wordList {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.Player__scoreTotal {
+  font-weight: 800;
+  color: var(--blue-500);
+}
+
+.right-align {
+  text-align: right;
 }
