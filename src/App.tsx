@@ -1,35 +1,161 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { FC, Fragment, useRef, useState } from "react";
+import "./App.css";
+import { useScoringLogic, Player } from "./useScoringLogic";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const state = useScoringLogic();
 
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>Take Two</h1>
+        <div>
+          <button type="button" onClick={() => state.addPlayer("New Player")}>
+            Add Player
+          </button>
+          <button type="button" onClick={() => state.clearWords()}>
+            New Game
+          </button>
+        </div>
+        {state.players.map((p, playerIndex) => (
+          <PlayerView
+            key={playerIndex}
+            player={p}
+            actions={bindState(playerIndex, state)}
+          />
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+const bindState = (
+  playerIndex: number,
+  state: ReturnType<typeof useScoringLogic>
+): PlayerProps["actions"] => {
+  return {
+    addWord: (w) => state.addWord(playerIndex, w),
+    removeWord: (i) => state.removeWord(playerIndex, i),
+    removePlayer: () => state.removePlayer(playerIndex),
+    setName: (n) => state.setPlayerName(playerIndex, n),
+  };
+};
+
+interface PlayerProps {
+  player: Player;
+  actions: {
+    addWord: (word: string) => void;
+    removeWord: (wordIndex: number) => void;
+    removePlayer: () => void;
+    setName: (name: string) => void;
+  };
+}
+
+const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
+  const [adding, setAdding] = useState(false);
+  const wordInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div>
+      <PlayerName
+        name={player.name}
+        onUpdate={(n) => actions.setName(n)}
+        onRemove={() => actions.removePlayer()}
+      />
+      {!adding && (
+        <div>
+          <button type="button" onClick={() => setAdding(true)}>
+            +
+          </button>
+        </div>
+      )}
+      {adding && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!wordInputRef.current) return;
+
+            const value = wordInputRef.current?.value.trim();
+            if (!value) return;
+
+            actions.addWord(value);
+            wordInputRef.current.value = "";
+          }}
+        >
+          <input type="text" ref={wordInputRef} />
+          <button type="button" onClick={() => setAdding(false)}>
+            Done
+          </button>
+        </form>
+      )}
+      {player.words.length === 0 && "No words added"}
+      <div>
+        {player.words.map((w, i) => (
+          <Fragment key={i}>
+            <span>{w.word}</span>
+            <span>{w.score}</span>
+          </Fragment>
+        ))}
+        <div>
+          <span>Total:</span>
+          <span>{player.score}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface PlayerNameProps {
+  name: string;
+  onUpdate: (name: string) => void;
+  onRemove: () => void;
+}
+
+const PlayerName: FC<PlayerNameProps> = (props) => {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(props.name);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  if (editing) {
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          props.onUpdate(value);
+          setEditing(false);
+        }}
+      >
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.currentTarget.value)}
+          ref={inputRef}
+        />
+        <button>Save</button>
+      </form>
+    );
+  }
+
+  return (
+    <div>
+      <div
+        onClick={() => {
+          setEditing(true);
+          setTimeout(() => inputRef.current?.focus());
+        }}
+      >
+        <h2>{props.name}</h2>
+      </div>
+      <button
+        type="button"
+        onClick={() => props.onRemove()}
+        title="Remove Player"
+      >
+        X
+      </button>
+    </div>
+  );
+};
+
+export default App;
