@@ -7,7 +7,7 @@
   color: var(--bone-200);
   background-color: var(--green-800);
   margin: 3rem auto;
-  width: min(100%, 450px);
+  width: min(85vw, 450px);
   min-height: 50vh;
 }
 
