@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC, Fragment, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useGameHistory } from "./useGameHistory";
 import "./HistoryModal.css";
@@ -12,11 +12,28 @@ export type Props = {
 };
 
 export const HistoryModal: FC<Props> = (props) => {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const { open } = props;
+
+  useEffect(() => {
+    if (open) {
+      dialogRef.current?.showModal();
+    }
+  }, [open]);
+
   return createPortal(
-    <dialog open={props.open} className="Modal">
+    <dialog className="Modal" ref={dialogRef}>
       <div className="ModalHeader">
         <h2>Past Games</h2>
-        <button type="button" onClick={props.onClose}>
+        <button
+          type="button"
+          onClick={() => {
+            dialogRef.current?.close();
+            props.onClose();
+          }}
+          autoFocus
+        >
           Close
         </button>
       </div>
