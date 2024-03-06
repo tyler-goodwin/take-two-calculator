@@ -32,3 +32,13 @@
   display: contents;
   color: var(--blue-300);
 }
+
+.Leaderboard {
+  margin-bottom: 2rem;
+}
+
+.Leaderboard__list {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  color: var(--blue-300);
+}
