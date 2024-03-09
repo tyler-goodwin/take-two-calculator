@@ -64,6 +64,7 @@ interface Word {
 export interface Player {
   name: string;
   words: Word[];
+  leftover?: Word;
   score: number;
 }
 
@@ -112,11 +113,27 @@ export const useScoringLogic = () => {
         return {
           ...player,
           words,
-          score: words.reduce((acc, w) => acc + w.score, 0),
+          score: words.reduce((acc, w) => acc + w.score, 0) - (player.leftover?.score || 0),
         };
       })
     );
   }, []);
+
+  const setLeftoverLetters = useCallback((playerIndex: number, letters: string) => {
+    setPlayers((players) => players.map((player, index) => {
+      if (index !== playerIndex) return player
+
+      const leftoverScore = -1 * calculateWordScore(letters)
+      return {
+        ...player,
+        leftover: {
+          word: letters,
+          score: leftoverScore,
+        },
+        score: player.words.reduce((acc, w) => acc + w.score, 0) - leftoverScore
+      }
+    }))
+  }, [])
 
   const removeWord = useCallback((playerIndex: number, wordIndex: number) => {
     setPlayers((players) =>
@@ -135,7 +152,7 @@ export const useScoringLogic = () => {
 
   const clearWords = useCallback(() => {
     setPlayers((players) =>
-      players.map((p) => ({ ...p, words: [], score: 0 }))
+      players.map((p) => ({ ...p, words: [], leftover: { word: "", score: 0 }, score: 0 }))
     );
   }, []);
 
@@ -147,5 +164,6 @@ export const useScoringLogic = () => {
     addWord,
     removeWord,
     clearWords,
+    setLeftoverLetters,
   };
 };

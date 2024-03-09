@@ -81,6 +81,7 @@ const bindState = (
     removePlayer: () => {
       if (confirm("Are you sure?")) state.removePlayer(playerIndex);
     },
+    setLeftover: (letters: string) => state.setLeftoverLetters(playerIndex, letters),
     setName: (n) => state.setPlayerName(playerIndex, n),
   };
 };
@@ -91,14 +92,34 @@ interface PlayerProps {
     addWord: (word: string) => void;
     removeWord: (wordIndex: number) => void;
     removePlayer: () => void;
+    setLeftover: (letters: string) => void;
     setName: (name: string) => void;
   };
 }
 
 const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
   const [adding, setAdding] = useState(false);
+  const [settingLeftover, setSettingLeftover] = useState(false);
   const [removing, setRemoving] = useState(false);
   const wordInputRef = useRef<HTMLInputElement>(null);
+
+  const beginSettingLeftover = () => {
+    setSettingLeftover(true)
+    setTimeout(() => {
+      if (!wordInputRef.current) return
+      wordInputRef.current.value = player.leftover?.word || ""
+      wordInputRef.current.focus()
+    })
+  }
+  const setLeftover = () => {
+    if (!wordInputRef.current) return;
+
+    const value = wordInputRef.current?.value.trim();
+    if (!value) return;
+
+    actions.setLeftover(value);
+    setSettingLeftover(false);
+  }
 
   return (
     <div className="Player">
@@ -108,7 +129,7 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
         onRemove={() => actions.removePlayer()}
       />
       <div className="Player__actions">
-        {!adding && !removing && (
+        {!adding && !removing && !settingLeftover && (
           <>
             <button
               type="button"
@@ -118,6 +139,9 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
               }}
             >
               + Add Words
+            </button>
+            <button type="button" onClick={beginSettingLeftover}>
+              + Leftover Letters
             </button>
             <button
               type="button"
@@ -158,6 +182,20 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
           </button>
         </form>
       )}
+      {settingLeftover && (
+        <form
+          className="Player__wordForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setLeftover();
+          }}
+        >
+          <input type="text" autoComplete="off" autoCorrect="off" spellCheck={false} ref={wordInputRef} />
+          <button type="button" onClick={setLeftover}>
+            Done
+          </button>
+        </form>
+      )}
       {player.words.length === 0 && <em>No words added</em>}
       <div className="Player__wordList">
         {player.words.map((w, i) => (
@@ -175,6 +213,10 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
             )}
           </Fragment>
         ))}
+        {player.leftover && <>
+          <span>Leftover: {player.leftover.word}</span>
+          <span className="right-align">{player.leftover.score}</span>
+        </>}
         <span className="Player__scoreTotal">Total:</span>
         <span className="Player__scoreTotal right-align">{player.score}</span>
       </div>
