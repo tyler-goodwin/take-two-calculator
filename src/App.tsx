@@ -115,7 +115,6 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
     if (!wordInputRef.current) return;
 
     const value = wordInputRef.current?.value.trim();
-    if (!value) return;
 
     actions.setLeftover(value);
     setSettingLeftover(false);
