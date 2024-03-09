@@ -113,7 +113,7 @@ export const useScoringLogic = () => {
         return {
           ...player,
           words,
-          score: words.reduce((acc, w) => acc + w.score, 0) - (player.leftover?.score || 0),
+          score: words.reduce((acc, w) => acc + w.score, 0) + (player.leftover?.score || 0),
         };
       })
     );
@@ -130,7 +130,7 @@ export const useScoringLogic = () => {
           word: letters,
           score: leftoverScore,
         },
-        score: player.words.reduce((acc, w) => acc + w.score, 0) - leftoverScore
+        score: player.words.reduce((acc, w) => acc + w.score, 0) + leftoverScore
       }
     }))
   }, [])
