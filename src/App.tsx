@@ -152,7 +152,7 @@ const PlayerView: FC<PlayerProps> = ({ player, actions }) => {
             wordInputRef.current.value = "";
           }}
         >
-          <input type="text" ref={wordInputRef} />
+          <input type="text" autoComplete="off" autoCorrect="off" spellCheck={false} ref={wordInputRef} />
           <button type="button" onClick={() => setAdding(false)}>
             Done
           </button>
